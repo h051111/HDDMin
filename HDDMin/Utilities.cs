@@ -105,6 +105,7 @@ public class Utilities
     public static List<List<T>> SplitList<T>(List<T> list, int n)  //Split list into n lists
     {
         List<List<T>> splitList = new List<List<T>>();
+        n = Math.Max(Math.Min(n, list.Count), 2);
 
         int start = 0;
         for (int i = 0; i < n; i++)

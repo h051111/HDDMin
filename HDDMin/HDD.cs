@@ -8,9 +8,17 @@ namespace HDDMin;
 
 public class HDD
 {
+    private int ddStepCounter = 0;
+    private int hddStepCounter = 0;  //dd is called this many times
+
+    private int granularity = 2;
+    private bool complementFirst = true;
+    
     public HDDTreeNode Reduce(IParseTree tree, String pathToTester, String testerName, ICharStream stream)  //Performs HDDMin on antlr tree root, parameter is a dictionary where key is a level and value contains nodes on that level
     {
         DD dd = new DD(pathToTester, testerName);
+        dd.SetGranularity(granularity);
+        dd.SetComplementFirst(complementFirst);
         HDDTreeNode root = BuildHDDTree(tree, stream);
 
         for (int i = 0; true; i++)
@@ -28,8 +36,11 @@ public class HDD
                 int idToPrune = levelNodes[tmpConfig[j]].id;
                 DeleteNode(GetRoot(levelNodes[tmpConfig[j]]), idToPrune);
             }
+
+            hddStepCounter++;
         }
 
+        ddStepCounter = dd.GetStepCounter();
         return root;
     }
 
@@ -86,6 +97,9 @@ public class HDD
                 ParserRuleContext context = (ParserRuleContext)root.GetChild(i);
                 Interval interval = new Interval(context.Start.StartIndex, context.Stop.StopIndex);
 
+                if (interval.a > interval.b)
+                    interval = new Interval(interval.b, interval.a);
+
                 HDDTreeNode newNode = new HDDTreeNode();
                 newNode.parent = node;
                 newNode.nodeText = stream.GetText(interval);
@@ -112,5 +126,25 @@ public class HDD
         }
 
         return configs;
+    }
+
+    public int GetDdStepCounter()
+    {
+        return ddStepCounter;
+    }
+
+    public int GetHddStepCounter()
+    {
+        return hddStepCounter;
+    }
+
+    public void SetGranularity(int granularity)
+    {
+        this.granularity = granularity;
+    }
+
+    public void SetComplementFirst(bool complementFirst)
+    {
+        this.complementFirst = complementFirst;
     }
 }

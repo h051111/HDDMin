@@ -6,7 +6,6 @@ namespace HDDMin;
 public class ParseTreeListener : IParseTreeListener
 {
     public HDDTreeNode treeRoot = new HDDTreeNode();
-    private int id = 0;
 
     public virtual void EnterEveryRule(ParserRuleContext context)
     {

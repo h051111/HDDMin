@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using static HDDMin.Utilities;
 
 namespace HDDMin;
@@ -14,9 +15,10 @@ public class DD
     private String testerName = "";
     private bool useShell = false;  //Useful for having scripts as testers
     private List<HDDTreeNode> config = new List<HDDTreeNode>();
-    private int granularity = 3;
+    private int granularity = 2;
     private bool debug = true;
     private bool complementFirst = true;
+    private static int stepCounter = 0;
 
     public DD(String pathToTester, String testerName)
     {
@@ -93,7 +95,6 @@ public class DD
             
             if(subsets.Count() == 1 && subsets[0].Count() == 1)  //1-minimal
             {
-                DebugWrite("Result is 1-minimal");
                 break;
             }
         }
@@ -181,26 +182,11 @@ public class DD
 
     private void WriteTestFile(List<int> subset)
     {
-        int v = 0;
         List<KeyValuePair<HDDTreeNode, HDDTreeNode>> deletedNodes = new List<KeyValuePair<HDDTreeNode, HDDTreeNode>>();  //We modify the tree to match the config
         
         List<int> tmpConfig = Enumerable.Range(0, config.Count()).ToList();
-
-
+            
         tmpConfig = tmpConfig.Except(subset).ToList();
-
-        /*foreach (int conf in subset)
-        {
-            if (v != conf)
-            {
-                int idToPrune = config[v].id;
-                SoftDeleteNode(GetRoot(config[v]), idToPrune);
-                deletedNodes.Add(Utilities.LastDeleted);  //Well this could be done better
-                v = conf;
-            }
-
-            v++;
-        }*/
 
         for (int i = 0; i < tmpConfig.Count; i++)
         {
@@ -227,6 +213,9 @@ public class DD
 
     private bool TestConfig(List<int> subset)  //True: FAIL, False: SUCCESS
     {
+        if (subset.Count() == 0)
+            return false;
+
         WriteTestFile(subset);
         Process proc = new Process
         {
@@ -243,10 +232,20 @@ public class DD
 
         proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
         
+        
+        DebugWrite(proc.StartInfo.Arguments);
+        
         proc.Start();
+        Thread.Sleep(200);
+        
+        Console.WriteLine(proc.StandardOutput.ReadToEnd());
+        Console.WriteLine(proc.StandardError.ReadToEnd());
         proc.WaitForExit();
         Console.WriteLine(proc.StandardOutput.ReadToEnd());
         Console.WriteLine(proc.StandardError.ReadToEnd());
+
+        stepCounter++;
+        
         return proc.ExitCode == 0;
     }
 
@@ -266,5 +265,20 @@ public class DD
         {
             Console.WriteLine();
         }
+    }
+
+    public int GetStepCounter()
+    {
+        return stepCounter;
+    }
+
+    public void SetGranularity(int granularity)
+    {
+        this.granularity = granularity;
+    }
+
+    public void SetComplementFirst(bool complementFirst)
+    {
+        this.complementFirst = complementFirst;
     }
 }
