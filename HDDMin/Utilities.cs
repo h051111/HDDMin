@@ -101,7 +101,7 @@ public class Utilities
         return recoveredSourceCode.Replace("<EOF>", "");
 
     }
-    
+
     public static List<List<T>> SplitList<T>(List<T> list, int n)  //Split list into n lists
     {
         List<List<T>> splitList = new List<List<T>>();

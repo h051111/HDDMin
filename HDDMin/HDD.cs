@@ -76,7 +76,29 @@ public class HDD
         return HDDRoot;
     }
 
+    /*
+     * Some grammars hide newlines, and we can't bypass that with directly reading from the stream,
+     * so we iterate over the current token, and if the next character would be a newline, we include that in the interval.
+     */
+    private Interval SearchNewline(Interval interval, ICharStream stream)
+    {
+        for (int b = interval.b+1;; b++)
+        {
+            String nextChar = stream.GetText(new Interval(b, b));
+            if (nextChar == "\n")
+            {
+                interval = new Interval(interval.a, b);
+                break;
+            }
+            else if (nextChar != " ")
+            {
+                break;
+            }
+        }
 
+        return interval;
+    }
+    
     public void _BuildHDDTree(IParseTree root, HDDTreeNode node, ICharStream stream)
     {
         for (int i = 0; i < root.ChildCount; i++)
@@ -89,6 +111,12 @@ public class HDD
                 newNode.parent = node;
                 newNode.height = GetHeight(newNode);
                 Interval interval = new Interval(terminalNode.Payload.StartIndex, terminalNode.Payload.StopIndex);
+                
+                if (interval.a > interval.b)
+                    interval = new Interval(interval.b, interval.a);
+
+                interval = SearchNewline(interval, stream);
+                
                 newNode.nodeText = stream.GetText(interval);
                 newNode.isTerminalNode = true;
                 node.children.Add(newNode);
@@ -100,6 +128,8 @@ public class HDD
 
                 if (interval.a > interval.b)
                     interval = new Interval(interval.b, interval.a);
+
+                interval = SearchNewline(interval, stream);
 
                 HDDTreeNode newNode = new HDDTreeNode();
                 newNode.parent = node;
