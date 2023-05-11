@@ -152,6 +152,10 @@ public class DD
         for(int i = 0; i < subsets.Count(); i++)
         {
             List<int> complement = tmpConfig.Except(subsets[i]).ToList();
+            if (complement.Count() == 0)
+            {
+                return new List<List<int>>();  //Technically theres no complement to find, so well just move on to subset
+            }
             if (TestConfig(complement))
             {
                 DebugWrite("ReduceToComplement success");
@@ -186,8 +190,9 @@ public class DD
         
         List<int> tmpConfig = Enumerable.Range(0, config.Count()).ToList();
             
-        tmpConfig = tmpConfig.Except(subset).ToList();
-
+        tmpConfig = tmpConfig.Except(subset).ToList();        
+        
+        
         for (int i = 0; i < tmpConfig.Count; i++)
         {
             int idToPrune = config[tmpConfig[i]].id;
@@ -205,9 +210,12 @@ public class DD
         {
             HDDTreeNode copyNode = kp.Key;
             HDDTreeNode node = kp.Value;
-            node.nodeText = copyNode.nodeText;
-            node.isTerminalNode = copyNode.isTerminalNode;
-            node.children = copyNode.children;
+            if (copyNode != null && node != null)
+            {
+                node.nodeText = copyNode.nodeText;
+                node.isTerminalNode = copyNode.isTerminalNode;
+                node.children = copyNode.children;
+            }
         }
     }
 

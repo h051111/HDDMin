@@ -21,7 +21,7 @@ public class HDD
         dd.SetComplementFirst(complementFirst);
         HDDTreeNode root = BuildHDDTree(tree, stream);
 
-        for (int i = 0; true; i++)
+        for (int i = 2; true; i++)
         {
             var levelNodes = GetLevel(root, i);
 
@@ -30,6 +30,7 @@ public class HDD
             List<int> newConfig = dd.Reduce(levelNodes);  //Minconfig
             List<int> tmpConfig = Enumerable.Range(0, levelNodes.Count()).ToList();
             tmpConfig = tmpConfig.Except(newConfig).ToList();
+            //List<int> tmpConfig = new List<int>(newConfig);
 
             for (int j = 0; j < tmpConfig.Count; j++)  //Prune the tree to minimal config given by dd
             {

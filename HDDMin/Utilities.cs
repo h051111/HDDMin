@@ -107,6 +107,12 @@ public class Utilities
         List<List<T>> splitList = new List<List<T>>();
         n = Math.Max(Math.Min(n, list.Count), 2);
 
+        if (list.Count == 1)  //If there is nothing to split, return with a single element added
+        {
+            splitList.Add(list);
+            return splitList;
+        }
+
         int start = 0;
         for (int i = 0; i < n; i++)
         {
