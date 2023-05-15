@@ -13,7 +13,7 @@ public class HDD
 
     private int granularity = 2;
     private bool complementFirst = true;
-    
+
     public HDDTreeNode Reduce(IParseTree tree, String pathToTester, String testerName, ICharStream stream)  //Performs HDDMin on antlr tree root, parameter is a dictionary where key is a level and value contains nodes on that level
     {
         DD dd = new DD(pathToTester, testerName);
@@ -57,7 +57,7 @@ public class HDD
         _GetLevel(root, level, levelList);
         return levelList;
     }
-    
+
     public void _GetLevel(HDDTreeNode root, int level, List<HDDTreeNode> levelList)
     {
         foreach(var node in root.children)
@@ -98,7 +98,7 @@ public class HDD
 
         return interval;
     }
-    
+
     public void _BuildHDDTree(IParseTree root, HDDTreeNode node, ICharStream stream)
     {
         for (int i = 0; i < root.ChildCount; i++)
@@ -111,12 +111,12 @@ public class HDD
                 newNode.parent = node;
                 newNode.height = GetHeight(newNode);
                 Interval interval = new Interval(terminalNode.Payload.StartIndex, terminalNode.Payload.StopIndex);
-                
+
                 if (interval.a > interval.b)
                     interval = new Interval(interval.b, interval.a);
 
                 interval = SearchNewline(interval, stream);
-                
+
                 newNode.nodeText = stream.GetText(interval);
                 newNode.isTerminalNode = true;
                 node.children.Add(newNode);
@@ -150,7 +150,7 @@ public class HDD
     private List<String> BuildConfig(List<HDDTreeNode> levelNodes)  //Builds a config from nodes
     {
         List<String> configs = new List<string>();
-        
+
         foreach (HDDTreeNode node in levelNodes)
         {
             configs.Add(String.Format("{0}\n", node.nodeText));
